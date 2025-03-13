@@ -2,13 +2,8 @@ from collections import defaultdict
 from preprocessing import preprocess_text
 
 def build_inverted_index(docs):
-    """
-    Given {doc_id: raw_text}, build an inverted index & doc length map.
-    Returns:
-        inverted_index: {term: {doc_id: tf}}
-        doc_lengths:    {doc_id: total_tokens}
-        collection_size: int (total # docs)
-    """
+    # Given {doc_id: raw_text}, build an inverted index & doc length map.
+
     inverted_index = defaultdict(lambda: defaultdict(int))
     doc_lengths = {}
 
@@ -23,8 +18,7 @@ def build_inverted_index(docs):
 def build_global_term_counts(inverted_index):
     """
     For Language Model:
-    Returns a dict of {term: total_count_in_collection},
-    plus the total number of tokens in the entire collection.
+    Returns a dict of {term: total_count_in_collection},plus the total number of tokens in the entire collection.
     """
     term_counts = {}
     total_tokens = 0

@@ -1,28 +1,3 @@
-#!/usr/bin/env python3
-"""
-CA6005 / CSC1121 - Assignment 1
-Simple IR System for the Cranfield Collection
-========================================================
-
-This script:
-    1. Parses the Cranfield documents (cran.all.1400.xml) and queries (cran.qry.xml)
-    2. Pre-processes text (tokenize, lowercase, remove basic stopwords, etc.)
-    3. Builds an inverted index
-    4. Implements:
-        - VSM (TF–IDF-like) ranking
-        - BM25 ranking
-        - Language Model ranking (Dirichlet smoothing)
-    5. Generates TREC-style output run files for each model
-
-Usage:
-    python assignment1.py
-
-Then run `trec_eval` on the output files:
-    trec_eval <PATH_TO>/cranqrel.trec.txt Outputs/vsm_run.txt
-    trec_eval <PATH_TO>/cranqrel.trec.txt Outputs/bm25_run.txt
-    trec_eval <PATH_TO>/cranqrel.trec.txt Outputs/lm_run.txt
-"""
-
 import os
 from parsers import parse_cranfield_documents, parse_cranfield_queries
 from indexing import build_inverted_index, build_global_term_counts
@@ -68,8 +43,7 @@ def main():
     print("  - Outputs/vsm_run.txt")
     print("  - Outputs/bm25_run.txt")
     print("  - Outputs/lm_run.txt")
-    print("\nNow evaluate with trec_eval, for example:")
-    print("  trec_eval ../data/cranqrel.trec.txt Outputs/vsm_run.txt")
+    print("\nNow evaluate with trec_eval, using WSL")
 
 if __name__ == "__main__":
     main()

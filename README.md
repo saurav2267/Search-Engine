@@ -18,7 +18,7 @@ A Python-based Information Retrieval system implementing multiple ranking models
 
 - **Evaluation**:
   - TREC-style evaluation
-  - Multiple metrics (MAP, NDCG, P@10)
+  - Multiple metrics (MAP, NDCG, P@5)
   - NDCG at various cutoff points (5, 10, 20)
   - Windows WSL support for trec_eval
 
@@ -86,21 +86,13 @@ This will:
 
 ### Evaluating Results
 
-Run the evaluation script:
-```bash
-python evaluate_results.py
-```
-
-Or specify a custom qrel file:
-```bash
-python evaluate_results.py path/to/cranqrel.trec.txt
-```
+open WSL, then 
 
 The evaluation will show:
 - MAP (Mean Average Precision)
 - NDCG (Normalized Discounted Cumulative Gain)
 - NDCG@k (k = 5, 10, 20)
-- P@10 (Precision at 10)
+- P@5 (Precision at 5)
 
 ### Customizing Preprocessing
 
@@ -127,7 +119,7 @@ tokens = preprocess_text(
 - **MAP**: Mean Average Precision across all queries
 - **NDCG**: Overall Normalized Discounted Cumulative Gain
 - **NDCG@k**: NDCG at specific cutoff points (5, 10, 20)
-- **P@10**: Precision at 10 documents retrieved
+- **P@10**: Precision at 5 documents retrieved
 
 ## File Formats
 

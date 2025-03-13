@@ -24,19 +24,7 @@ def preprocess_text(text: str,
                    use_lemmatization: bool = True,
                    min_length: int = 2,
                    remove_numbers: bool = True) -> List[str]:
-    """
-    Compact text preprocessing using NLTK.
-    
-    Args:
-        text: Input text
-        use_stemming: Whether to apply Porter stemming
-        use_lemmatization: Whether to apply WordNet lemmatization
-        min_length: Minimum token length
-        remove_numbers: Whether to remove numbers
-    
-    Returns:
-        List of preprocessed tokens
-    """
+   
     # Initialize stemmers/lemmatizers if needed
     stemmer = PorterStemmer() if use_stemming else None
     lemmatizer = WordNetLemmatizer() if use_lemmatization else None
