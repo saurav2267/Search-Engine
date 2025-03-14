@@ -4,38 +4,53 @@ from preprocessing import preprocess_text
 
 def rank_vsm(query_text, inverted_index, df, N, doc_lengths):
     """
-    TF-IDF (log-based IDF) scoring, partial or no normalization for simplicity.
+    Vector Space Model with TF-IDF scoring and normalization.
     Returns list of (doc_id, score) sorted descending by score.
     """
     query_tokens = preprocess_text(query_text)
     query_tf = Counter(query_tokens)
     scores = {}
+    
+    # Calculate query vector length for normalization
+    query_length = 0
+    for term, qf in query_tf.items():
+        if term in inverted_index:
+            idf = math.log2((N / (df[term] + 1)))
+            query_length += (qf * idf) ** 2
+    query_length = math.sqrt(query_length)
 
+    # Calculate document scores
     for term, qf in query_tf.items():
         if term not in inverted_index:
             continue
 
-        # IDF (using log base 2 for demonstration)
+        # IDF with smoothing
         idf = math.log2((N / (df[term] + 1)))
         w_qt = qf * idf
 
         # Accumulate scores for docs that have this term
         for doc_id, tf_dt in inverted_index[term].items():
-            w_dt = tf_dt * idf
-            scores[doc_id] = scores.get(doc_id, 0) + (w_dt * w_qt)  # dot-product component
+            # TF with length normalization
+            doc_len = doc_lengths[doc_id]
+            w_dt = (tf_dt / doc_len) * idf
+            scores[doc_id] = scores.get(doc_id, 0) + (w_dt * w_qt)
 
-    # Sort by descending score
+    # Normalize scores by query length
+    for doc_id in scores:
+        scores[doc_id] /= query_length
+
     ranked_docs = sorted(scores.items(), key=lambda x: x[1], reverse=True)
     return ranked_docs
 
-def rank_bm25(query_text, inverted_index, df, N, doc_lengths, k1=1.2, b=0.75):
+def rank_bm25(query_text, inverted_index, df, N, doc_lengths, k1=1.5, b=0.75):
     """
-    BM25 ranking.
+    BM25 ranking with optimized parameters.
     Returns list of (doc_id, score) sorted descending by BM25 score.
     """
     query_tokens = preprocess_text(query_text)
     query_tf = Counter(query_tokens)
 
+    # Calculate average document length
     avgdl = sum(doc_lengths.values()) / float(N)
     scores = {}
 
@@ -44,13 +59,14 @@ def rank_bm25(query_text, inverted_index, df, N, doc_lengths, k1=1.2, b=0.75):
             continue
 
         df_t = df[term]
-        # IDF part
+        # Enhanced IDF with smoothing
         idf = math.log2((N - df_t + 0.5) / (df_t + 0.5) + 1)
 
         posting_list = inverted_index[term]
         for doc_id, f_dt in posting_list.items():
             doc_len = doc_lengths[doc_id]
-            numerator = f_dt * (k1 + 1)
+            # Enhanced BM25 formula with query term frequency
+            numerator = f_dt * (k1 + 1) * qf
             denominator = f_dt + k1 * (1 - b + b * (doc_len / avgdl))
             score = idf * (numerator / denominator)
             scores[doc_id] = scores.get(doc_id, 0) + score
@@ -59,28 +75,29 @@ def rank_bm25(query_text, inverted_index, df, N, doc_lengths, k1=1.2, b=0.75):
     return ranked_docs
 
 def rank_language_model(query_text, inverted_index, df, doc_lengths,
-                       term_counts, total_tokens, mu=2000):
+                       term_counts, total_tokens, mu=2500):
     """
-    Dirichlet smoothing.
+    LM Model with Dirichlet smoothing and mu parameter of 2500.
     For each document, sum log( P(t|d) ) for t in query.
     Returns list of (doc_id, score) in descending order (score = log-prob).
     """
     query_tokens = preprocess_text(query_text)
+    query_tf = Counter(query_tokens)
     scores = {}
 
     for doc_id, doc_len in doc_lengths.items():
         log_prob_sum = 0.0
 
-        for t in query_tokens:
+        for term, qf in query_tf.items():
             f_dt = 0
-            if t in inverted_index and doc_id in inverted_index[t]:
-                f_dt = inverted_index[t][doc_id]
-            c_t = term_counts.get(t, 0)  # total freq of term t in entire collection
+            if term in inverted_index and doc_id in inverted_index[term]:
+                f_dt = inverted_index[term][doc_id]
+            c_t = term_counts.get(term, 0)
 
-            # Dirichlet smoothing formula
+            # Enhanced Dirichlet smoothing with query term frequency
             p_t_d = (f_dt + mu * (c_t / total_tokens)) / (doc_len + mu)
             if p_t_d > 0:
-                log_prob_sum += math.log(p_t_d)
+                log_prob_sum += qf * math.log(p_t_d)
 
         scores[doc_id] = log_prob_sum
 
