@@ -32,7 +32,6 @@ A Python-based Information Retrieval system implementing multiple ranking models
 ├── indexing.py         # Inverted index construction
 ├── ranking_models.py   # Implementation of ranking models
 ├── output.py           # TREC output generation
-├── evaluate_results.py # Evaluation script
 └── requirements.txt    # Python dependencies
 ```
 
@@ -91,7 +90,6 @@ open WSL, then
 The evaluation will show:
 - MAP (Mean Average Precision)
 - NDCG (Normalized Discounted Cumulative Gain)
-- NDCG@k (k = 5, 10, 20)
 - P@5 (Precision at 5)
 
 ### Customizing Preprocessing
@@ -118,7 +116,6 @@ tokens = preprocess_text(
 
 - **MAP**: Mean Average Precision across all queries
 - **NDCG**: Overall Normalized Discounted Cumulative Gain
-- **NDCG@k**: NDCG at specific cutoff points (5, 10, 20)
 - **P@10**: Precision at 5 documents retrieved
 
 ## File Formats
